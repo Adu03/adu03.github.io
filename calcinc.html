@@ -34,6 +34,8 @@
             </fieldset>
         </form>
        <samp>七日年化收益率：货币基金最近7日的<em>平均收益</em>水平，进行年化以后得出的数据。</samp>
+        <br/>
+        <samp>本程序仅供参考，并不能作为任何商业性质计算使用。</samp>
         <!--- 
         <input id="slider1" type="range" min="100" max="500" step="10" />
         -->
@@ -69,8 +71,6 @@
                                 deadline = deadline/ONEYEARDEFAULTDAYS;//转化为年
                             }
                             calcInCome( principal,rate_value,deadline,intrest_type,rete_type );
-                            console.log( '总收入：'+sumincome+'  '+'日收入：'+ everydayincome);
-                            $("#calc-result").val(showCalcResult(sumincome,everydayincome));
                         }else if( rete_type == INTERST_RATE_DAY ){
                             //日收益率 期限是 日
                             if( dead_unit == INTREST_UNIT_DAY  ){
@@ -81,10 +81,14 @@
                                 deadline = deadline*ONEYEARDEFAULTDAYS;//转化为日
                             }
                             calcInCome( principal,rate_value,deadline,intrest_type,rete_type );
-                            console.log( '总收入：'+sumincome+'  '+'日收入：'+ everydayincome);
-                            $("#calc-result").val(showCalcResult(sumincome,everydayincome));
                         }
-                    
+                            if( $("#calc-result").val() == "" ){
+                                $("#calc-result").val(showCalcResult(sumincome,everydayincome));
+                            }else{
+                                var cs = $("#calc-result").val();
+                                 cs += '\r\n--------------------\r\n';
+                                $("#calc-result").val(cs + showCalcResult(sumincome,everydayincome));
+                            }
                 }else{
                      $("#calc-result").val('缺少计算参数！');
                 }
