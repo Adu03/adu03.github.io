@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8"/>
+        <title>收益率计算</title>
+        <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
+    </head>
+    <body>
+        <form action="">
+            <fieldset>
+                <legend>年（化）收益率计算：</legend>
+                <!--利息计算方式-->
+                <input type="radio" name="intrest-type" id="single" value="single" checked/><label for="single">单利(P)</label>
+                <input type="radio" name="intrest-type" id="complex" value="complex"/><label for="complex">复利(P)</label>
+                <br/>
+                <!--利率-->
+                <input type="radio" name="rate-type" id="year-calc" value="year" checked/><label for="year-calc">年利率(R)</label>
+                <input type="radio" name="rate-type" id="day-calc" value="day"/><label for="day-calc">每万份日收益率(R)</label>
+                &nbsp;
+                <input type="number" id="ratevalue" min="0"/>%
+                <br/>
+                <label for="principal">本金(P):</label>&nbsp;<input type="number" id="principal" min="0" value="10000"/>￥
+                <br/>
+                <label for="deadline">期限(N):</label>&nbsp;<input type="number" id="deadline" min="0" value="1"/>
+                <input type="radio" name="dead-unit" id="year-dead" value="year" checked /><label for="year-dead">年(Y)</label>
+                <input type="radio" name="dead-unit" id="year-month" value="month" /><label for="year-month">月(M)</label>
+                <input type="radio" name="dead-unit" id="year-day" value="day" /><label for="year-day">日(D)</label>
+                <br/>
+                <button type="button" id="calc-button">计算</button>
+                <br/>
+                <br/>
+                <textarea rows="10" cols="30" id="calc-result" placeholder="暂无计算结果" disabled></textarea>
+
+            </fieldset>
+        </form>
+       <samp>七日年化收益率：货币基金最近7日的<em>平均收益</em>水平，进行年化以后得出的数据。</samp>
+        <!--- 
+        <input id="slider1" type="range" min="100" max="500" step="10" />
+        -->
+        <script>
+            const INTREST_TYPE_SINGLE = 'single';
+            const INTREST_TYPE_COMPLEX = 'complex';
+            const INTERST_RATE_YEAR = 'year';
+            const INTERST_RATE_DAY = 'day';
+            const INTREST_UNIT_YEAR = 'year';
+            const INTREST_UNIT_MONTH = 'month';
+            const INTREST_UNIT_DAY = 'day';
+            const ONEYEARDEFAULTDAYS = 365;
+            const ONEMONTHDEFAULTDAYS = 30;
+            const ONEYEARDEFAULTMONTHS = 12;
+            var sumincome = 0;
+            var everydayincome = 0;
+            $("#calc-button").click(function(){
+                var intrest_type = $("[name='intrest-type']:checked").val();//单 复
+                var rete_type = $("[name='rate-type']:checked").val();//年 每日
+                var rate_value = $("#ratevalue").val();
+                var principal = $("#principal").val();
+                var deadline = $("#deadline").val();
+                var dead_unit = $("[name='dead-unit']:checked").val();
+                console.log( rate_value + '  '+ principal + '  '+deadline +'  '+intrest_type  + '  '+dead_unit);
+                if( rate_value > 0 && principal > 0 && deadline > 0 ){
+                        if( rete_type == INTERST_RATE_YEAR ){
+                            //年化率 期限是年
+                            if( dead_unit == INTREST_UNIT_YEAR ){
+                                //deadline = deadline;
+                            }else if( dead_unit == INTREST_UNIT_MONTH ){
+                                deadline = deadline/ONEYEARDEFAULTMONTHS;//转化为年
+                            }else{
+                                deadline = deadline/ONEYEARDEFAULTDAYS;//转化为年
+                            }
+                            calcInCome( principal,rate_value,deadline,intrest_type,rete_type );
+                            console.log( '总收入：'+sumincome+'  '+'日收入：'+ everydayincome);
+                            $("#calc-result").val(showCalcResult(sumincome,everydayincome));
+                        }else if( rete_type == INTERST_RATE_DAY ){
+                            //日收益率 期限是 日
+                            if( dead_unit == INTREST_UNIT_DAY  ){
+
+                            }else if( dead_unit == INTREST_UNIT_MONTH ){
+                                deadline = deadline*ONEMONTHDEFAULTDAYS;//转化为日
+                            }else{
+                                deadline = deadline*ONEYEARDEFAULTDAYS;//转化为日
+                            }
+                            calcInCome( principal,rate_value,deadline,intrest_type,rete_type );
+                            console.log( '总收入：'+sumincome+'  '+'日收入：'+ everydayincome);
+                            $("#calc-result").val(showCalcResult(sumincome,everydayincome));
+                        }
+                    
+                }else{
+                     $("#calc-result").val('缺少计算参数！');
+                }
+            });
+            /**
+             *@param  p 本金，r 年利率， n 期限(年),it 单利 || 复利,rt 年化率|| 日收益率
+            */
+           function calcInCome( p,r,n,it,rt ){
+                if( it ==  INTREST_TYPE_COMPLEX ){
+                    sumincome = p*Math.pow((1+r/100),n)-p;
+                }else{
+                    sumincome = p*r/100*n;
+                }
+                if( rt == INTERST_RATE_YEAR  ){
+                    everydayincome = (sumincome/n/ONEYEARDEFAULTDAYS).toFixed(3);
+                }else if( rt == INTERST_RATE_DAY ){
+                    everydayincome = (sumincome/n).toFixed(3);
+                }
+           }
+         
+           function showCalcResult(s,e){
+                return '总收入：'+s+'￥\r\n'+'每日收入：'+e+'￥';
+           }
+        </script>
+    </body>
+</html>
